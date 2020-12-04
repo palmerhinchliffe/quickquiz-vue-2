@@ -18,7 +18,7 @@ import ChatWidget from '~/components/ChatWidget'
 
 export default {
   data: () => ({
-    clients: [],
+    players: [],
     messages: [],
     room: null,
     error: null,
