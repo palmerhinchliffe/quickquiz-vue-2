@@ -1,7 +1,5 @@
 <template>
-  <v-card
-    class="mx-auto"
-  >
+  <v-card class="mx-auto chatWidget">
     <v-toolbar color="dark accent-4" dark>
       <v-toolbar-title>Cindy's Quiz</v-toolbar-title>
 
@@ -12,24 +10,23 @@
       </v-btn>
     </v-toolbar>
 
-    <v-list>
+    <v-list dense>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>Me</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item
         v-for="client in clients"
         :key="client.title"
       >
-        <v-list-item-avatar>
-          <v-img
-            :alt="`${client.title} avatar`"
-            :src="client.avatar"
-          ></v-img>
-        </v-list-item-avatar>
-
         <v-list-item-content>
           <v-list-item-title v-text="client.title"></v-list-item-title>
         </v-list-item-content>
         <v-btn icon>
           <v-icon>
-            mdi-account-remove
+            mdi-account-key
           </v-icon>
         </v-btn>
       </v-list-item>
@@ -37,20 +34,21 @@
 
     <v-divider></v-divider>
 
-    <v-card-text style="overflow-y: scroll; height: 150px;">
-      <p v-for="(message, index) in messages" :key="index" style="font-size: 12px;">
+    <v-card-text class="chatWidget__messageWindow">
+      <p class="chatWidget__messageText my-0" v-for="(message, index) in messages" :key="index">
         <strong>{{ message }}</strong>
       </p>
     </v-card-text>
     <v-card-actions>
-      <v-textarea
-        :value="message"
+      <v-text-field
+        v-model="message"
         class="mx-2"
         label="Say something..."
         rows="1"
         prepend-icon="mdi-comment"
         @change="updateMessage"
-      ></v-textarea>
+        @keydown.enter="send"
+      ></v-text-field>
       <v-btn @click="send">Send</v-btn>
     </v-card-actions>
   </v-card>
@@ -62,22 +60,13 @@ export default {
     message: '',
     clients: [
       {
-        active: true,
-        avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-        title: 'Jason Oner',
+        title: 'Jason',
       },
       {
-        active: true,
-        avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-        title: 'Mike Carlson',
+        title: 'Mike',
       },
       {
-        avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-        title: 'Cindy Baker',
-      },
-      {
-        avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-        title: 'Ali Connors',
+        title: 'Cindy',
       },
     ],
   }),
@@ -100,3 +89,15 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.chatWidget {
+  &__messageWindow {
+    overflow-y: scroll;
+    height: 200px;
+  }
+  &__messageText {
+    font-size: 12px;
+  }
+}
+</style>

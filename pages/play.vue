@@ -8,6 +8,8 @@
         <ChatWidget :messages="messages" @send="sendChatMessage" />
       </v-col>
     </v-row>
+
+    <DialogAskName :isOpen="!hasGivenName" @submit="setPlayerName" />
   </v-layout>
 </template>
 
@@ -15,21 +17,27 @@
 import * as Colyseus from 'colyseus.js'
 import GameConfigWidget from '~/components/GameConfigWidget'
 import ChatWidget from '~/components/ChatWidget'
+import DialogAskName from '~/components/DialogAskName'
 
 export default {
   data: () => ({
-    players: [],
+    hasGivenName: false,
     messages: [],
-    room: null,
-    error: null,
+    room: {},
+    error: '',
   }),
   components: {
     GameConfigWidget,
     ChatWidget,
+    DialogAskName,
   },
   methods: {
     sendChatMessage(message) {
       this.room.send('message', message)
+    },
+    setPlayerName(name) {
+      this.room.send('setPlayerName', name)
+      this.hasGivenName = true
     },
   },
   mounted() {
@@ -41,7 +49,7 @@ export default {
       // new room state
       room.onStateChange((state) => {
         // this signal is triggered on each patch
-        console.log(state.players)
+        console.log(state)
       })
 
       room.onError((code, message) => {
@@ -54,7 +62,6 @@ export default {
       })
 
       room.onLeave((code) => {
-        console.log(client.id, 'left', room.name)
       })
     }).catch(error => {
         this.error = error

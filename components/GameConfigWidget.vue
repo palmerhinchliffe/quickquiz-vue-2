@@ -1,7 +1,5 @@
 <template>
-  <v-card
-    class="mx-auto"
-  >
+  <v-card class="mx-auto">
     <v-toolbar color="dark accent-4" dark>
       <v-toolbar-title>Settings</v-toolbar-title>
     </v-toolbar>
