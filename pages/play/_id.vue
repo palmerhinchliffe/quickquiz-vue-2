@@ -5,11 +5,17 @@
         <GameConfigWidget />
       </v-col>
       <v-col class="col-12 col-lg-3">
-        <ChatWidget :messages="messages" @send="sendChatMessage" />
+        <ChatWidget
+          :messages="messages"
+          :room-url="`http://localhost:3000/play/${this.room.id}`"
+          @send="sendChatMessage"
+        />
       </v-col>
     </v-row>
 
-    <DialogAskName :isOpen="!hasGivenName" @submit="setPlayerName" />
+    <DialogSetName :is-open="dialogSetName" @submit="setPlayerName" />
+
+    <DialogError :is-open="dialogError" :error="errorString" />
   </v-layout>
 </template>
 
@@ -17,19 +23,20 @@
 import * as Colyseus from 'colyseus.js'
 import GameConfigWidget from '~/components/GameConfigWidget'
 import ChatWidget from '~/components/ChatWidget'
-import DialogAskName from '~/components/DialogAskName'
+import DialogSetName from '~/components/DialogSetName'
 
 export default {
   data: () => ({
-    hasGivenName: false,
+    dialogSetName: false,
     messages: [],
     room: {},
-    error: '',
+    dialogError: false,
+    errorString: '',
   }),
   components: {
     GameConfigWidget,
     ChatWidget,
-    DialogAskName,
+    DialogSetName,
   },
   methods: {
     sendChatMessage(message) {
@@ -37,19 +44,16 @@ export default {
     },
     setPlayerName(name) {
       this.room.send('setPlayerName', name)
-      this.hasGivenName = true
+      this.dialogSetName = false
     },
-  },
-  mounted() {
-    const client = new Colyseus.Client('ws://localhost:2567')
-
-    client.joinOrCreate('quiz').then(room => {
+    onJoinOrCreate(room) {
       this.room = room
+      console.log(room)
+      this.dialogSetName = true
 
       // new room state
       room.onStateChange((state) => {
         // this signal is triggered on each patch
-        console.log(state)
       })
 
       room.onError((code, message) => {
@@ -63,9 +67,28 @@ export default {
 
       room.onLeave((code) => {
       })
-    }).catch(error => {
-        this.error = error
-    })
+    }
+  },
+  mounted() {
+    const client = new Colyseus.Client('ws://localhost:2567')
+    let quizId
+
+    if (this.$route.params.id) {
+      // Attempt to join existing quiz
+      client.joinById(this.$route.params.id).then(room => {
+        this.onJoinOrCreate(room)
+      }).catch(error => {
+          this.error = error
+          this.dialogError = true
+      })
+    } else {
+      client.create('quiz').then(room => {
+        this.onJoinOrCreate(room)
+      }).catch(error => {
+          this.error = error
+          this.dialogError = true
+      })
+    }
   },
 }
 </script>

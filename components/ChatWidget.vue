@@ -1,7 +1,7 @@
 <template>
   <v-card class="mx-auto chatWidget">
     <v-toolbar color="dark accent-4" dark>
-      <v-toolbar-title>Cindy's Quiz</v-toolbar-title>
+      <v-toolbar-title>My Quiz</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -34,6 +34,26 @@
 
     <v-divider></v-divider>
 
+    <v-card-text>
+
+          <v-text-field
+            disabled
+            outlined
+            clearable
+            :value="roomUrl"
+            type="text"
+          >
+            <template v-slot:append>
+                <v-icon>
+                  mdi-link
+                </v-icon>
+            </template>
+          </v-text-field>
+
+    </v-card-text>
+
+    <v-divider></v-divider>
+
     <v-card-text class="chatWidget__messageWindow">
       <p class="chatWidget__messageText my-0" v-for="(message, index) in messages" :key="index">
         <strong>{{ message }}</strong>
@@ -58,17 +78,7 @@
 export default {
   data: () => ({
     message: '',
-    clients: [
-      {
-        title: 'Jason',
-      },
-      {
-        title: 'Mike',
-      },
-      {
-        title: 'Cindy',
-      },
-    ],
+    clients: [],
   }),
   methods: {
     updateMessage(value) {
@@ -85,6 +95,10 @@ export default {
     messages: {
       type: Array,
       required: false,
+    },
+    roomUrl: {
+      type: String,
+      required: true,
     },
   },
 }
