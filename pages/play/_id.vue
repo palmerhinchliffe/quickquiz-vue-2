@@ -7,7 +7,10 @@
       <v-col class="col-12 col-lg-3">
         <ChatWidget
           :messages="messages"
-          :room-url="`http://localhost:3000/play/${this.room.id}`"
+          :room="{
+            url: `http://localhost:3000/play/${this.room.id}`,
+            name: 'Temp quiz',
+          }"
           @send="sendChatMessage"
         />
       </v-col>
@@ -33,6 +36,29 @@ export default {
     dialogError: false,
     errorString: '',
   }),
+  mounted() {
+    const client = new Colyseus.Client('ws://localhost:2567')
+    let quizId
+
+    // If no param provided
+    if (this.$route.params.id) {
+      // Attempt to join existing quiz
+      client.joinById(this.$route.params.id).then(room => {
+        this.onJoinOrCreate(room)
+      }).catch(error => {
+          this.error = error
+          this.dialogError = true
+      })
+    } else {
+      // Create new quiz
+      client.create('quiz').then(room => {
+        this.onJoinOrCreate(room)
+      }).catch(error => {
+          this.error = error
+          this.dialogError = true
+      })
+    }
+  },
   components: {
     GameConfigWidget,
     ChatWidget,
@@ -54,6 +80,7 @@ export default {
       // new room state
       room.onStateChange((state) => {
         // this signal is triggered on each patch
+        console.log(room.clients)
       })
 
       room.onError((code, message) => {
@@ -66,27 +93,6 @@ export default {
       })
 
       room.onLeave((code) => {
-      })
-    }
-  },
-  mounted() {
-    const client = new Colyseus.Client('ws://localhost:2567')
-    let quizId
-
-    if (this.$route.params.id) {
-      // Attempt to join existing quiz
-      client.joinById(this.$route.params.id).then(room => {
-        this.onJoinOrCreate(room)
-      }).catch(error => {
-          this.error = error
-          this.dialogError = true
-      })
-    } else {
-      client.create('quiz').then(room => {
-        this.onJoinOrCreate(room)
-      }).catch(error => {
-          this.error = error
-          this.dialogError = true
       })
     }
   },

@@ -1,7 +1,7 @@
 <template>
   <v-card class="mx-auto chatWidget">
     <v-toolbar color="dark accent-4" dark>
-      <v-toolbar-title>My Quiz</v-toolbar-title>
+      <v-toolbar-title>{{ room.name }}</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -35,21 +35,17 @@
     <v-divider></v-divider>
 
     <v-card-text>
-
-          <v-text-field
-            disabled
-            outlined
-            clearable
-            :value="roomUrl"
-            type="text"
-          >
-            <template v-slot:append>
-                <v-icon>
-                  mdi-link
-                </v-icon>
-            </template>
-          </v-text-field>
-
+      <v-text-field
+        outlined
+        :value="room.url"
+        type="text"
+      >
+        <template v-slot:append>
+          <v-icon>
+            mdi-link
+          </v-icon>
+        </template>
+      </v-text-field>
     </v-card-text>
 
     <v-divider></v-divider>
@@ -96,8 +92,8 @@ export default {
       type: Array,
       required: false,
     },
-    roomUrl: {
-      type: String,
+    room: {
+      type: Object,
       required: true,
     },
   },
